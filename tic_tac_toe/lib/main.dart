@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:tic_tac_toe/game/presentation/game_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'game/presentation/game_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
