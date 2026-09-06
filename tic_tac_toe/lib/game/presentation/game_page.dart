@@ -1,8 +1,9 @@
+import 'package:tic_tac_toe/game/presentation/game_board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:tic_tac_toe/game/presentation/game_board.dart';
 import 'package:tic_tac_toe/game/presentation/controller/game_controller.dart';
+import 'package:tic_tac_toe/game/presentation/game_result_card.dart';
+import 'package:tic_tac_toe/game/domain/game_state.dart';
 
 class GamePage extends ConsumerWidget {
   const GamePage({
@@ -15,6 +16,7 @@ class GamePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameControllerProvider);
+    final gameController = ref.read(gameControllerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,6 +46,7 @@ class GamePage extends ConsumerWidget {
                   'Petit Boulot',
                   style: TextStyle(
                     fontSize: 12,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
@@ -51,45 +54,54 @@ class GamePage extends ConsumerWidget {
 
             const Spacer(),
 
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 8,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    gameState.currentPlayer == 1
-                        ? 'Tour : X'
-                        : 'Tour : O',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+            if (gameState.status == GameStatus.playing)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                    Text(
+                        gameState.currentPlayer == 1
+                            ? 'Tour : X'
+                            : 'Tour : O',
+                        style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    gameState.currentPlayer == 1
-                        ? 'Joueur 1'
-                        : 'Joueur 2',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.8),
+                    const SizedBox(height: 2),
+                    Text(
+                        gameState.currentPlayer == 1
+                            ? 'Joueur 1'
+                            : 'Joueur 2',
+                        style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w400,
+                        ),
                     ),
-                  ),
-                ],
-              ),
-            ),
+                    ],
+                ),
+                ),
           ],
         ),
       ),
-      body: const Center(
-        child: GameBoard(),
+
+      body: Center(
+        child: gameState.status == GameStatus.playing
+            ? const GameBoard()
+            : GameResultCard(
+                status: gameState.status,
+                winner: gameState.winner,
+                onReplay: gameController.resetGame,
+              ),
       ),
     );
   }
